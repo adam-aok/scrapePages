@@ -1,5 +1,8 @@
 main();
 
+//written December 2019
+//this is a new take on the project pages scrape code. it has been tailored to search for data based on locations rather than master stories
+//safety nets have been added including margin functions, master spread checks, and layout detection
 
 //basic declaration of interaction levels to override link/font warnings to ease batch run
 function main(){
