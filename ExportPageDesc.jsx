@@ -1,17 +1,9 @@
-﻿//ExportAllStories.jsx
-//An InDesign JavaScript
-/*  
-@@@BUILDINFO@@@ "ExportAllStories.jsx" 3.0.0 15 December 2009
-*/
-//Exports all stories in an InDesign document in a specified text format.
-//
-//For more on InDesign/InCopy scripting see the documentation included in the Scripting SDK 
-//available at http://www.adobe.com/devnet/indesign/sdk.html
-//or visit the InDesign Scripting User to User forum at http://www.adobeforums.com
-//
+﻿//Scrapes data from Adobe InDesign Document in one of various standard firm layouts for output to loadable CSV
+
 main();
 function main(){
-	//Make certain that user interaction (display of dialogs, etc.) is turned on.
+	
+	//Make certain that user interaction (display of dialogs, etc.) is turned on. Turn on to see broken links
     //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
      app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
 	if(app.documents.length != 0){
@@ -129,17 +121,6 @@ if (typeof Array.prototype.indexOf != "function") {
              pageRow[7] = myStoryText;
              }
          
-                              
-        //var sideBar = myStory.split("@^@^");
-         //if(sideBar.length != 0){
-             //myStory = sideBar(0) + "\"\,";
-             //for (sbCounter = 0; sbCounter < sideBar.length - 1; cbCounter++){
-             //myStory = myStory + "\"" + sideBar(sbCounter) + "\"\,";
-             //;
-         //myStory = myStory.replace(("Size@^"),"").replace("Services@^","\,\"").replace("Client@^","\","").replace("Awards@^","\",)
-         
-        //adds row to CSV
-        //myID = app.activeDocument.stories.firstItem().id;
         }
 
 //link adding functions seems to have created an issue
@@ -157,24 +138,6 @@ if (typeof Array.prototype.indexOf != "function") {
     myPageText = pageRow.toString() + "\n";    
     //myStoryText = myStoryText +"\"" + app.activeDocument.name + "\"\," + "\"" + myBounds + "\"\," + "\"" + largest + "\"\, \n";
     
-//~ 		switch(myExportFormat){
-//~ 			case 0:
-//~ 				myFormat = ExportFormat.textType;
-//~ 				myExtension = ".txt"
-//~ 				break;
-//~ 			case 1:
-//~ 				myFormat = ExportFormat.RTF;
-//~ 				myExtension = ".rtf"
-//~ 				break;
-//~ 			case 2:
-//~ 				myFormat = ExportFormat.taggedText;
-//~ 				myExtension = ".txt"
-//~ 				break;
-//~               case 3:
-//~                   myFormat = ExportFormat.textType;
-//~                   myExtension = ".csv"
-//~                   break;
-//~ 		}
 
          writeFile(myFile, myPageText);
 }
