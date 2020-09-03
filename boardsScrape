@@ -11,8 +11,8 @@ main();
 
 //basic declaration of interaction levels to override link/font warnings to ease batch run
 function main(){
-    //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
-    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+    //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
     if(app.documents.length != 0){
 		if (app.activeDocument.stories.length != 0){
               myFolder = ("U:/")
@@ -32,6 +32,7 @@ function myExportPages(myExportFormat, myFolder){
     myFileName = "ak.DataMine_" + curDate.toDateString()+ myExportFormat;
     myFilePath = myFolder + "/" + myFileName;
     var myFile = new File(myFilePath);
+    app.scriptPreferences.measurementUnit = MeasurementUnits.INCHES;
     
 //resolves the lack of indexOf function   
 if (typeof Array.prototype.indexOf != "function") {  
@@ -94,7 +95,8 @@ if (typeof Array.prototype.indexOf != "function") {
     
     var locArr5 = [1.22,2.2744,2.9215,3.5564,4.1968,4.8382,5.4793,5.5951]
     
-     dirTitle = "71010";
+     dirNo = "ProjectNo";
+     dirTitle = "ProjectName";
 
     //declaration of textbox layout array--the default is Q3 2018 layout
     //var templateBoxes = locArr4;    
@@ -108,16 +110,14 @@ if (typeof Array.prototype.indexOf != "function") {
         }
     
     //iterating through spreads of document (spreads are designated instead of pages to accommodate spreads of multiple sheets with common information)
-    for(myCounter = 0; myCounter < app.activeDocument.pages.length; myCounter++){
+   
+   for(myCounter = 0; myCounter < app.activeDocument.pages.length; myCounter++){
         //get current page
         myPage = app.activeDocument.pages.item(myCounter);
-        
         myLinks = app.activeDocument.links;
         
-        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage.name == myCounter && myLinks[w].name.indexOf("_mr") == -1 && myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
+        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.parentPage.name == myCounter && myLinks[w].name.indexOf("_mr") == -1 && myLinks[w].name.indexOf("_1_1") == -1 && myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
         
-        //alert(linkBucket);
-        //alert(pageRow.length);
         for (z = 0; z <pageRow.length;z++) pageRow[z] = csvQuotes(csvFriendly(templateBoxes[z].val));
         
         modify = false;
@@ -128,7 +128,6 @@ if (typeof Array.prototype.indexOf != "function") {
         
          //ungroups any layers within the document, if there are any.                  
          for(z=0;z<myPage.groups.length;z++){
-                //alert(z);
                 checkGroup = myPage.groups.item(z);
                 checkGroup.ungroup(); 
             }
@@ -136,27 +135,41 @@ if (typeof Array.prototype.indexOf != "function") {
      for (h = 0;h <templateBoxes.length;h++){
          for (j = 0;j <myPage.textFrames.length;j++){
              myPosition = myPage.textFrames[j].geometricBounds;
-             if (approx(myPosition[0],templateBoxes[h].y) && approx(myPosition[1],templateBoxes[h].x) && templateBoxes[h].val == "") templateBoxes[h].val = myPage.textFrames[j].parentStory.contents;}
+             if (approx(myPosition[0],templateBoxes[h].y) && approx(myPosition[1],templateBoxes[h].x) && templateBoxes[h].val == ""){
+                 templateBoxes[h].val = myPage.textFrames[j].parentStory.contents;
+                 //alert(templateBoxes[h].val);
+                 }
          }
+     }
+     
+     if (templateBoxes[1].val == "" && myPage.appliedMaster !== null){
+         masterTextFrames = myPage.appliedMaster.textFrames;
+         //myPage.textFrames = myPage.appliedMaster.textFrames;
+         for (t = 0;t <templateBoxes.length;t++){
+          for (b = 0;b <masterTextFrames.length;b++){
+             myPosition = masterTextFrames[b].geometricBounds;
+             if (approx(myPosition[0],templateBoxes[t].y) && approx(myPosition[1],templateBoxes[t].x) && templateBoxes[t].val == ""){                
+                 templateBoxes[t].val = masterTextFrames[b].parentStory.contents;                 
+                 //alert(templateBoxes[t].val);
+                 }
+         }
+     }
+     }
      
      for (z = 0; z <pageRow.length;z++){
          pageRow[z] = csvQuotes(csvFriendly(templateBoxes[z].val));
          //alert(pageRow);
+         
          }
    if (pageRow[0] !== "\""+ "\"" && pageRow[0] !== "" && projIndex[projIndex.length-1] !== pageRow && modify == false){
-        // dirTitle = templateBoxes[0].val + "_" + templateBoxes[1].val;
-       dirTitle = templateBoxes[0].val.replace(/[^A-Z0-9]/ig, "_");
-       //alert(dirTitle);
+        dirTitle = templateBoxes[1].val.replace(/[^A-Z0-9]/ig, "_");
+       dirNo = templateBoxes[0].val.replace(/[^A-Z0-9]/ig, "_");
        writeDataAndLinks(fileArr,pageRow,myFile);
-       //exportLinks(dirTitle,linkBucket);
        projIndex.push(pageRow);
-       //alert(pageRow[0] + "_is currently being added. the projectindexlength is now " +projIndex.length + " and the list as follows is: " );
-       //alert(projIndex[projIndex.length-1] + " added. this is from page " + myCounter);
-       
        }
    
-    if (dirTitle !== ""){
-        exportLinks(dirTitle,linkBucket);
+    if (dirNo !== ""){
+        exportLinks(dirTitle,dirNo,linkBucket);
         linkBucket = [{}];
         linkBucket.pop();
         }
@@ -164,45 +177,34 @@ if (typeof Array.prototype.indexOf != "function") {
     //alert("length of project index " + projIndex.length);
     for (e=0;e<templateBoxes.length;e++) templateBoxes[e].val = "";
 
-//alert("projIndex is currently " + projIndex);
-//dataAndLinks(fileArr,projIndex,linkIndex,myFile);
 }
+
 }
 
 function writeDataAndLinks(fileArr,pR,myFile){
         //alert(pR);
         myPageText = fileArr.toString() +"\," + pR.toString() + "\n";        
         //alert("adding to export: "+ pR);
-        writeFile(myFile,myPageText);
+        writeFile(myFile,myPageText,"UTF-8");
         }
     
-function exportLinks(dT,getLinks){
+function exportLinks(dT,dN,getLinks){
 //alert(getLinks.length);
    for (l = 0; l < getLinks.length; l++){
         var eachLink = new Link();
         eachLink = getLinks[l];
-        //alert("The current link is: " + eachLink.status);        
-        //alert(projName + " " + projNum);
-        //savePath = "U:/ExportedLinks/";
-        //projNum = projNum.replace("\"",'_')
-        
-        //savePath = "U:/ExportedLinks/"+dT;
-        savePath = "G:/Committees/Design-Communication/Design On The Boards/2020/Exported/"+dT;
-        //alert(projNum);
+        savePath = "G:/Committees/Design-Communication/Design On The Boards/2020/Exported/"+dT+"_"+dN;
         var myFolder = new Folder(savePath);
         myFolder.create();
-        //alert(myFolder);
-        //eachLink.copyLink(savePath,"",false);
         //alert("copying file from "+ eachLink.filePath);
-        eachLink.copyLink(savePath,"",false);
-        //eachLink.copyLink(savePath+"/"+eachLink,"copied",true);
-        //linkArr.push("\"" + eachLink + "\"");
+        eachLink.copyLink(savePath,"",true);
         }
   return getLinks;
   }
 
 //sets encoding properties and writing components
-function writeFile(fileObj, fileContent, encoding) {  
+function writeFile(fileObj, fileContent, encoding) {
+    //var csvContent = 'data:text/csv;charset=utf-8,%EF%BB%BF'
     encoding = encoding || "UTF-8";
     var titleRow = [csvQuotes("Path"),csvQuotes("Modified"),csvQuotes("Office"),csvQuotes("Project Name"),csvQuotes("Project Number"),csvQuotes("Location"),csvQuotes("Practice Area"),csvQuotes("Construction Type"),csvQuotes("Size"),csvQuotes("Estimated Cost"),csvQuotes("Estimated Completion"),csvQuotes("Sustainability"),csvQuotes("Project Description"),csvQuotes("Team")];
     if (!fileObj.exists) fileContent2 = titleRow.toString() + "\n" + fileContent;
@@ -213,7 +215,7 @@ function writeFile(fileObj, fileContent, encoding) {
     var parentFolder = fileObj.parent;
     if (!parentFolder.exists && !parentFolder.create())  
         throw new Error("Cannot create file in path " + fileObj.fsName);  
-  
+        
     fileObj.encoding = encoding;  
     fileObj.open("a");  
     fileObj.write(fileContent2);  
