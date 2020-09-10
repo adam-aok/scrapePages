@@ -109,12 +109,14 @@ if (typeof Array.prototype.indexOf != "function") {
     
     //iterating through spreads of document (spreads are designated instead of pages to accommodate spreads of multiple sheets with common information)
    
-   for(myCounter = 0; myCounter < app.activeDocument.pages.length; myCounter++){
+   for(myCounter = 35; myCounter < app.activeDocument.pages.length; myCounter++){
         //get current page
+        //alert("number of pages in document is " + app.activeDocument.pages.length);
+        //alert("Current page is " + myCounter);
         myPage = app.activeDocument.pages.item(myCounter);
         myLinks = app.activeDocument.links;
         
-        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.parentPage.name == myCounter && myLinks[w].name.indexOf("_mr") == -1 && myLinks[w].name.indexOf("_1_1") == -1 && myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
+        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.parentPage.name == myCounter + 1 && myLinks[w].name.indexOf("_mr") == -1 && myLinks[w].name.indexOf("_1_1") == -1 && myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
         
         for (z = 0; z <pageRow.length;z++) pageRow[z] = csvQuotes(csvFriendly(templateBoxes[z].val));
         
@@ -125,8 +127,8 @@ if (typeof Array.prototype.indexOf != "function") {
         for(pR = 0; pR < 13 ; pR++) pageRow[pR] = ("\"" + "\"");
         
          //ungroups any layers within the document, if there are any.                  
-         for(z=0;z<myPage.groups.length;z++){
-                checkGroup = myPage.groups.item(z);
+         for(s=0;s<myPage.groups.length;s++){
+                checkGroup = myPage.groups.item(s);
                 checkGroup.ungroup(); 
             }
         
@@ -162,11 +164,13 @@ if (typeof Array.prototype.indexOf != "function") {
    if (pageRow[0] !== "\""+ "\"" && pageRow[0] !== "" && projIndex[projIndex.length-1] !== pageRow && modify == false){
         dirTitle = templateBoxes[1].val.replace(/[^A-Z0-9]/ig, "_");
        dirNo = templateBoxes[0].val.replace(/[^A-Z0-9]/ig, "_");
+       //alert(dirNo);
        writeDataAndLinks(fileArr,pageRow,myFile);
        projIndex.push(pageRow);
        }
    
-    if (dirNo !== ""){
+    if (dirNo !== "" && linkBucket.length > 0){        
+        alert("copying file from page"+ myCounter + " and the first image is " + linkBucket[0].filePath);
         exportLinks(dirTitle,dirNo,linkBucket);
         linkBucket = [{}];
         linkBucket.pop();
@@ -187,11 +191,10 @@ function writeDataAndLinks(fileArr,pR,myFile){
         }
     
 function exportLinks(dT,dN,getLinks){
-//alert(getLinks.length);
    for (l = 0; l < getLinks.length; l++){
         var eachLink = new Link();
         eachLink = getLinks[l];
-        savePath = "G:/Committees/Design-Communication/Design On The Boards/2020/Exported/"+dT+"_"+dN;
+        savePath = "G:/Committees/Design-Communication/Design On The Boards/2020/ExportedLinks/"+dT+"_"+dN;
         var myFolder = new Folder(savePath);
         myFolder.create();
         //alert("copying file from "+ eachLink.filePath);
