@@ -7,8 +7,6 @@ main();
 //updated August 2020 with working variables for newly formatted spreads from Q2 2020.
 //other notes: code has been added to drastically simplify the aggregation steps, and an exportLinks function has been written to pull and associate all images 
 
-main();
-
 //basic declaration of interaction levels to override link/font warnings to ease batch run
 function main(){
     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
@@ -63,7 +61,7 @@ if (typeof Array.prototype.indexOf != "function") {
     linkIndex.pop();
     
     //load file info array into project index of filepath, modify date
-    fileArr[0] = csvQuotes(app.activeDocument.fullName.toString().replace("/g/","G:/"));
+    fileArr[0] = csvQuotes(app.activeDocument.fullName.toString().replace("/g/","//d-peapcny.net/enterprise/G_Gen-Admin/"));
     fileArr[1] = csvQuotes(File(app.activeDocument.fullName).modified);
     
     //fill row with null values at first
