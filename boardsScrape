@@ -109,7 +109,7 @@ if (typeof Array.prototype.indexOf != "function") {
     
     //iterating through spreads of document (spreads are designated instead of pages to accommodate spreads of multiple sheets with common information)
    
-   for(myCounter = 35; myCounter < app.activeDocument.pages.length; myCounter++){
+   for(myCounter = 0; myCounter < app.activeDocument.pages.length; myCounter++){
         //get current page
         //alert("number of pages in document is " + app.activeDocument.pages.length);
         //alert("Current page is " + myCounter);
