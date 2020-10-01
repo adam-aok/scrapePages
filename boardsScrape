@@ -1,6 +1,6 @@
 main();
 
-//BoardsScrape, by Adam Ormsby Keefe
+//BoardsScrape, by Adam Keefe
 //written December 2019, updated August 2020
 //this is a new take on the project pages scrape code. it has been tailored to search for data based on locations rather than master stories
 //safety nets have been added including margin functions, master spread checks, and layout detection
@@ -116,8 +116,13 @@ if (typeof Array.prototype.indexOf != "function") {
         myPage = app.activeDocument.pages.item(myCounter);
         myLinks = app.activeDocument.links;
         
-        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.parentPage.name == myCounter + 1 && myLinks[w].name.indexOf("_mr") == -1 && myLinks[w].name.indexOf("_1_1") == -1 && myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
-        
+        for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && 
+                                                            myLinks[w].parent.parentPage.name == myCounter + 1 && 
+                                                            myLinks[w].name.indexOf("_mr") == -1 &&
+                                                            myLinks[w].name.indexOf("_1.") == -1 &&
+                                                            myLinks[w].status !== LinkStatus.LINK_MISSING) linkBucket.push(myLinks[w]);
+                                                            
+        //alert("LinkBucket size is: " + linkBucket.length);
         for (z = 0; z <pageRow.length;z++) pageRow[z] = csvQuotes(csvFriendly(templateBoxes[z].val));
         
         modify = false;
@@ -162,7 +167,7 @@ if (typeof Array.prototype.indexOf != "function") {
          
          }
    if (pageRow[0] !== "\""+ "\"" && pageRow[0] !== "" && projIndex[projIndex.length-1] !== pageRow && modify == false){
-        dirTitle = templateBoxes[1].val.replace(/[^A-Z0-9]/ig, "_");
+       dirTitle = templateBoxes[1].val.replace(/[^A-Z0-9]/ig, "_");
        dirNo = templateBoxes[0].val.replace(/[^A-Z0-9]/ig, "_");
        //alert(dirNo);
        writeDataAndLinks(fileArr,pageRow,myFile);
@@ -170,7 +175,7 @@ if (typeof Array.prototype.indexOf != "function") {
        }
    
     if (dirNo !== "" && linkBucket.length > 0){        
-        alert("copying file from page"+ myCounter + " and the first image is " + linkBucket[0].filePath);
+       //alert("copying file from page"+ myCounter + " and the first image is " + linkBucket[0].filePath);
         exportLinks(dirTitle,dirNo,linkBucket);
         linkBucket = [{}];
         linkBucket.pop();
@@ -194,11 +199,11 @@ function exportLinks(dT,dN,getLinks){
    for (l = 0; l < getLinks.length; l++){
         var eachLink = new Link();
         eachLink = getLinks[l];
-        savePath = "G:/Committees/Design-Communication/Design On The Boards/2020/ExportedLinks/"+dT+"_"+dN;
+        savePath = "//d-peapcny.net/enterprise/G_Gen-Admin/Committees/Design-Communication/Design On The Boards/2020/ExportedLinks/"+dT+"_"+dN;
         var myFolder = new Folder(savePath);
         myFolder.create();
         //alert("copying file from "+ eachLink.filePath);
-        eachLink.copyLink(savePath,"",true);
+        eachLink.copyLink(savePath,"",false);
         }
   return getLinks;
   }
@@ -207,7 +212,12 @@ function exportLinks(dT,dN,getLinks){
 function writeFile(fileObj, fileContent, encoding) {
     //var csvContent = 'data:text/csv;charset=utf-8,%EF%BB%BF'
     encoding = encoding || "UTF-8";
-    var titleRow = [csvQuotes("Path"),csvQuotes("Modified"),csvQuotes("Office"),csvQuotes("Project Name"),csvQuotes("Project Number"),csvQuotes("Location"),csvQuotes("Practice Area"),csvQuotes("Construction Type"),csvQuotes("Size"),csvQuotes("Estimated Cost"),csvQuotes("Estimated Completion"),csvQuotes("Sustainability"),csvQuotes("Project Description"),csvQuotes("Team")];
+    var titleRow = [csvQuotes("Path"),csvQuotes("Modified"),csvQuotes("Office"),
+                            csvQuotes("Project Number"),csvQuotes("Project Name"),csvQuotes("Location"),
+                            csvQuotes("Practice Area"),csvQuotes("Construction Type"),csvQuotes("Size"),
+                            csvQuotes("Estimated Cost"),csvQuotes("Estimated Completion"),csvQuotes("Project Description"),
+                            csvQuotes("Sustainability"),csvQuotes("Team"),csvQuotes("Design Intent"),
+                            csvQuotes("AIA 2030 Challenge"),csvQuotes("Team")];
     if (!fileObj.exists) fileContent2 = titleRow.toString() + "\n" + fileContent;
     else fileContent2 = fileContent;
          
