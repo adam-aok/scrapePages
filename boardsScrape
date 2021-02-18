@@ -4,7 +4,7 @@ main();
 //written December 2019, updated August 2020
 //this is a new take on the project pages scrape code. it has been tailored to search for data based on locations rather than master stories
 //safety nets have been added including margin functions, master spread checks, and layout detection
-//updated August 2020 with working variables for newly formatted spreads from Q2 2020.
+//updated Feb 2021 to rewrite to 2021 folder instead of 2020
 //other notes: code has been added to drastically simplify the aggregation steps, and an exportLinks function has been written to pull and associate all images 
 
 //basic declaration of interaction levels to override link/font warnings to ease batch run
@@ -199,7 +199,7 @@ function exportLinks(dT,dN,getLinks){
    for (l = 0; l < getLinks.length; l++){
         var eachLink = new Link();
         eachLink = getLinks[l];
-        savePath = "//d-peapcny.net/enterprise/G_Gen-Admin/Committees/Design-Communication/Design On The Boards/2020/ExportedLinks/"+dT+"_"+dN;
+        savePath = "//d-peapcny.net/enterprise/G_Gen-Admin/Committees/Design-Communication/Design On The Boards/2021/ExportedLinks/"+dT+"_"+dN;
         var myFolder = new Folder(savePath);
         myFolder.create();
         //alert("copying file from "+ eachLink.filePath);
