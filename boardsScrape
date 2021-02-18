@@ -4,7 +4,7 @@ main();
 //written December 2019, updated August 2020
 //this is a new take on the project pages scrape code. it has been tailored to search for data based on locations rather than master stories
 //safety nets have been added including margin functions, master spread checks, and layout detection
-//updated Feb 2021 to rewrite to 2021 folder instead of 2020
+//updated Feb 2021 to rewrite to 2021 folder instead of 2020, as well as saving to the source folder
 //other notes: code has been added to drastically simplify the aggregation steps, and an exportLinks function has been written to pull and associate all images 
 
 //basic declaration of interaction levels to override link/font warnings to ease batch run
@@ -13,7 +13,7 @@ function main(){
     //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
     if(app.documents.length != 0){
 		if (app.activeDocument.stories.length != 0){
-              myFolder = ("U:/")
+              myFolder = ("//d-peapcny.net/enterprise/G_Gen-Admin/Committees/Design-Communication/Design On The Boards/2021/ScrapeCode")
               expFormat = ".txt"
               myExportPages(expFormat, myFolder)
               //myExportLinks(
