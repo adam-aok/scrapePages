@@ -1,11 +1,12 @@
-﻿//Scrapes data from Adobe InDesign Document in one of various standard firm layouts for output to loadable CSV
+﻿//scrapePages: worked on during August - September 2019
+//Scrapes data from Adobe InDesign Document in one of various standard firm layouts for output to loadable CSV
 
 main();
 function main(){
 	
 	//Make certain that user interaction (display of dialogs, etc.) is turned on. Turn on to see broken links
-    //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
-     app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+    //app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
 	if(app.documents.length != 0){
 		if (app.activeDocument.stories.length != 0){
 			//myDisplayDialog();
@@ -55,20 +56,20 @@ if (typeof Array.prototype.indexOf != "function") {
          
          myStory = app.activeDocument.stories.item(myCounter);
          
-         //replaces story paragraph breaks with @^ and commas with #% --DO NOT FORGET TO REPLACE THEM
-         myStoryText = "\"" + myStory.contents.replace(/(\r\n|\n|\r)/gm,"@^").replace("\,","#%") + "\"";
+         //replaces story paragraph breaks with @^ and commas with </p><p> --DO NOT FORGET TO REPLACE THEM
+         myStoryText = "\"" + csvFriendly(myStory.contents) + "\"";
+         
          if (myStory.paragraphs.firstItem().isValid == true){
          myStoryStyle = myStory.paragraphs.firstItem().appliedParagraphStyle.name;
          }
+     
          //myBounds = app.activeDocument.textFrames.item(myCounter).geometricBounds.toString();
               
          //parse page title, commit to row         
          if (myStoryStyle == "Project Name"){
              var nameArr = new String();
-             nameBox = myStory.contents.replace(/(\r\n|\n|\r)/gm,"@^").replace("\,","#%");
-             nameArr = nameBox.split("@^");
-             
-             //pageRow[4] = "\"" + nameArr.pop() + "\"";
+             nameBox = myStory.contents.replace(/(\r\n|\n|\r)/gm,"</p><p>").replace("\,","#%");
+             nameArr = nameBox.split("</p><p>");             
              pageRow[4] = "\"" + nameArr[nameArr.length-1] + "\"";
              nameArr.pop();
              pageRow[3] = "\"" + nameArr.toString().replace("\,"," ") + "\"";
@@ -134,10 +135,11 @@ function writeFile(fileObj, fileContent, encoding) {
     return fileObj;  
 }  
 
+//function to search to
 function parseSidebar(myStory,Start,Finish){
     var sizeArr = [""];
     refString = csvFriendly(myStory.contents);
-    var refArr = refString.split("@^");
+    var refArr = refString.split("</p><p>");
     sizeReturn = "";
     
     //loads paragraphs into string reference array
@@ -148,19 +150,24 @@ function parseSidebar(myStory,Start,Finish){
 //~     
     //loads sizeArr with relevant data after size line
     sizeArr = refArr.slice(refArr.indexOf(Start)+1, refArr.indexOf(Finish));
-
     sizeReturn = "\"" + sizeArr.toString().replace(/,/g,";")     + "\"";
-//.replace("\,",";")    
-    return sizeReturn;
-    
+    return sizeReturn;    
     }
-
-
+    
+//3 functions to rework text into quotes/HTML format for the purposes of being loaded into a workable CSV
+function csvQuotes(myText){
+    myText = ("\"" + trim(myText) + "\"");
+    return myText
+}
         
 function csvFriendly(myText){
-    myText = myText.replace(/(\r\n|\n|\r)/gm,"@^").replace(/,/g,"#%");
+    myText = trim(myText.toString().replace(/(\r\n|\n|\r)/gm,"</p><p>").replace(/,/g,"#%"));
     return myText;
  }
+ 
+ function trim(str) {
+    return str.toString().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
 
 function logMe(input){
      var now = new Date();
