@@ -24,41 +24,6 @@ function main(){
 	}
 }
 
-//~ function myDisplayDialog(){
-//~ 	with(myDialog = app.dialogs.add({name:"ExportAllStories"})){
-//~ 		//Add a dialog column.
-//~ 		myDialogColumn = dialogColumns.add()	
-//~ 		with(myDialogColumn){
-//~ 			with(borderPanels.add()){
-//~ 				staticTexts.add({staticLabel:"Export as:"});
-//~ 				with(myExportFormatButtons = radiobuttonGroups.add()){
-//~ 					radiobuttonControls.add({staticLabel:"Text Only", checkedState:true});
-//~ 					radiobuttonControls.add({staticLabel:"RTF"});
-//~ 					radiobuttonControls.add({staticLabel:"InDesign Tagged Text"});
-//~                       radiobuttonControls.add({staticLabel:"CSV"});
-//~ 				}
-//~ 			}
-//~ 		}
-//~ 		myReturn = myDialog.show();
-//~ 		if (myReturn == true){
-//~ 			//Get the values from the dialog box.
-//~ 			myExportFormat = myExportFormatButtons.selectedButton;
-//~ 			myDialog.destroy;
-//~ 			myFolder= Folder.selectDialog ("Choose a Folder");
-//~ 			if((myFolder != null)&&(app.activeDocument.stories.length !=0)){
-//~ 				myExportAllStories(myExportFormat, myFolder);
-//~ 			}
-//~ 		}
-//~ 		else{
-//~ 			myDialog.destroy();
-//~ 		}
-//~ 	}
-//~ }
-
-//myExportStories function takes care of exporting the stories.
-//myExportFormat is a number from 0-2, where 0 = text only, 1 = rtf, and 3 = tagged text.
-//myFolder is a reference to the folder in which you want to save your files.
-
 function myExportDesc(myExportFormat, myFolder){
     var curDate = new Date();
     myFileName = "ak.DataMine_" + curDate.toDateString()+ myExportFormat;
@@ -146,6 +111,12 @@ if (typeof Array.prototype.indexOf != "function") {
 
 function writeFile(fileObj, fileContent, encoding) {  
     encoding = encoding || "UTF-8";  
+    var titleRow = [csvQuotes("Path"),csvQuotes("FileName"),csvQuotes("ProjectNo"),
+                            csvQuotes("Title"),csvQuotes("Location"),csvQuotes("SquareFootage"),
+                            csvQuotes("Services"),csvQuotes("ProjectDescription")];
+                            
+    if (!fileObj.exists) fileContent2 = titleRow.toString() + "\n" + fileContent;
+    else fileContent2 = fileContent;
     fileObj = (fileObj instanceof File) ? fileObj : new File(fileObj);  
   
   
@@ -156,7 +127,7 @@ function writeFile(fileObj, fileContent, encoding) {
   
     fileObj.encoding = encoding;  
     fileObj.open("a");  
-    fileObj.write(fileContent);  
+    fileObj.write(fileContent2);  
     fileObj.close();  
   
   
