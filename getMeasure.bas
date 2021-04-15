@@ -20,7 +20,8 @@ GetMeasure = Result
 End Function
 
 
-'similar syntax is used for a Power Query M formula. See here
+'similar process used is used for a Power Query M formula. See below for details. 
+'goes through each column of a set of columns, checking for a string. returns the value if found
 'if Text.Contains([SquareFootage.1],"sf") then [SquareFootage.1]
 'else
 'if Text.Contains([SquareFootage.2],"sf") then [SquareFootage.2]
