@@ -39,92 +39,86 @@ if (typeof Array.prototype.indexOf != "function") {
         }  
 }  
 
-    largest = "";    
-    var pageRow = [];
     
+    var linkBucket = [{}];
+    linkBucket.pop();
+    
+    var pageRow = [];
     //fill row with null values at first
-    for(pR = 0; pR < 7 ; pR++){
-        pageRow[pR] = ("\"" + "\"");
-        }
+    for(pR = 0; pR < 14 ; pR++) pageRow[pR] = ("\"" + "\"");
+    
+    largest = "";
     
     var fnArr = app.activeDocument.name.split("_");
     pageRow[0] = ("\"" + app.activeDocument.filePath + "\"")
     pageRow[1] = ("\"" + fnArr[0] + "\"");
     pageRow[2] = ("\"" + fnArr[1] + "\"");
     
+    mainLayer = app.activeDocument.activeLayer;
+    
+    myLinks = app.activeDocument.links;
+
+    for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.itemLayer == mainLayer) linkBucket.push(myLinks[w]);
+    for (z = 0;z<linkBucket.length;z++) pageRow[9+z] = csvQuotes(linkBucket[z].name);   
+    
     for(myCounter = 0; myCounter < app.activeDocument.stories.length; myCounter++){
          
          myStory = app.activeDocument.stories.item(myCounter);
+                  
+         myStoryText = csvQuotes(csvFriendly(myStory.contents));
          
-         //replaces story paragraph breaks with @^ and commas with </p><p> --DO NOT FORGET TO REPLACE THEM
-         myStoryText = "\"" + csvFriendly(myStory.contents) + "\"";
-         
-         if (myStory.paragraphs.firstItem().isValid == true){
-         myStoryStyle = myStory.paragraphs.firstItem().appliedParagraphStyle.name;
-         }
-     
-         //myBounds = app.activeDocument.textFrames.item(myCounter).geometricBounds.toString();
-              
-         //parse page title, commit to row         
+         if (myStory.paragraphs.firstItem().isValid == true) myStoryStyle = myStory.paragraphs.firstItem().appliedParagraphStyle.name;
+                       
          if (myStoryStyle == "Project Name"){
              var nameArr = new String();
-             nameBox = myStory.contents.replace(/(\r\n|\n|\r)/gm,"</p><p>").replace("\,","#%");
-             nameArr = nameBox.split("</p><p>");             
+             nameBox = csvFriendly(myStory.contents);
+             nameArr = nameBox.split("</p><p>");      
              pageRow[4] = "\"" + nameArr[nameArr.length-1] + "\"";
              nameArr.pop();
              pageRow[3] = "\"" + nameArr.toString().replace("\,"," ") + "\"";
              }
          
-         //parses Sidebar for size
+//~          //parses Sidebar for size
        if (myStoryStyle == "Project Details"){
              pageRow[5] = parseSidebar(myStory,"Size","Services");
              pageRow[6] = parseSidebar(myStory,"Services","Client");
             }
          
-         //parses for Description text & compares the length of the story to see if it is the longest string represented so far    
+//~          //parses for Description text & compares the length of the story to see if it is the longest string represented so far    
          if (myStoryStyle == "Body Text" && myStoryText.length > largest.length){
              largest = myStoryText;
              pageRow[7] = myStoryText;
              }
          
-        }
+         if (myStoryStyle == "Project Page Callout") pageRow[8] = myStoryText;
+         
+        
 
-//link adding functions seems to have created an issue
-//var linkArr = [];
-
-//parses for link list
-//for(myCounter = 0; myCounter < app.activeDocument.links.length; myCounter++){
-   // eachLink = app.activeDocument.links.item(myCounter).filePath;
-    //if (linkArr.indexOf("\"" + eachLink + "\"") == -1){
-    //    linkArr.push("\"" + eachLink + "\"")
-    //}
-    //}
-    
+    }
     //myPageText = pageRow.toString() + "\," +   linkArr.toString() + "\n";
-    myPageText = pageRow.toString() + "\n";    
+    myPageText = pageRow.toString() + "\n";
+    //alert(pageRow.toString());
     //myStoryText = myStoryText +"\"" + app.activeDocument.name + "\"\," + "\"" + myBounds + "\"\," + "\"" + largest + "\"\, \n";
-    
-
-         writeFile(myFile, myPageText);
+    writeFile(myFile, myPageText);
 }
-
-//test 
 
 function writeFile(fileObj, fileContent, encoding) {  
     encoding = encoding || "UTF-8";  
     var titleRow = [csvQuotes("Path"),csvQuotes("FileName"),csvQuotes("ProjectNo"),
                             csvQuotes("Title"),csvQuotes("Location"),csvQuotes("SquareFootage"),
-                            csvQuotes("Services"),csvQuotes("ProjectDescription")];
+                            csvQuotes("Services"),csvQuotes("ProjectDescription"),csvQuotes("CallOut"),
+                            csvQuotes("Link1"),csvQuotes("Link2"),csvQuotes("Link3"),
+                            csvQuotes("Link4"),csvQuotes("Link5"),csvQuotes("Link6")];
                             
     if (!fileObj.exists) fileContent2 = titleRow.toString() + "\n" + fileContent;
     else fileContent2 = fileContent;
-    fileObj = (fileObj instanceof File) ? fileObj : new File(fileObj);  
-  
+    
+   //alert(fileContent2)
+    
+    fileObj = (fileObj instanceof File) ? fileObj : new File(fileObj);
   
     var parentFolder = fileObj.parent;  
-    if (!parentFolder.exists && !parentFolder.create())  
-        throw new Error("Cannot create file in path " + fileObj.fsName);  
-  
+    if (!parentFolder.exists && !parentFolder.create()) throw new Error("Cannot create file in path " + fileObj.fsName);  
   
     fileObj.encoding = encoding;  
     fileObj.open("a");  
@@ -159,7 +153,8 @@ function csvQuotes(myText){
     myText = ("\"" + trim(myText) + "\"");
     return myText
 }
-        
+
+//replaces story paragraph breaks with </p><p> and commas with #% --DO NOT FORGET TO REPLACE THEM
 function csvFriendly(myText){
     myText = trim(myText.toString().replace(/(\r\n|\n|\r)/gm,"</p><p>").replace(/,/g,"#%"));
     return myText;
