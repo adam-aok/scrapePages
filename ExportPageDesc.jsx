@@ -45,14 +45,18 @@ if (typeof Array.prototype.indexOf != "function") {
     
     var pageRow = [];
     //fill row with null values at first
-    for(pR = 0; pR < 14 ; pR++) pageRow[pR] = ("\"" + "\"");
+    for(pR = 0; pR < 16 ; pR++) pageRow[pR] = ("\"" + "\"");
     
     largest = "";
-    
+
+    //file information 
+    pageRow[0] = csvQuotes(app.activeDocument.fullName.toString().replace("/m/","//d-peapcny.net/enterprise/M_Marketing/"));
+    pageRow[1] = = csvQuotes(File(app.activeDocument.fullName).modified);
+
     var fnArr = app.activeDocument.name.split("_");
-    pageRow[0] = ("\"" + app.activeDocument.filePath + "\"")
-    pageRow[1] = ("\"" + fnArr[0] + "\"");
-    pageRow[2] = ("\"" + fnArr[1] + "\"");
+    pageRow[2] = ("\"" + app.activeDocument.filePath + "\"")
+    pageRow[3] = ("\"" + fnArr[0] + "\"");
+    pageRow[4] = ("\"" + fnArr[1] + "\"");
     
     mainLayer = app.activeDocument.activeLayer;
     
@@ -73,21 +77,21 @@ if (typeof Array.prototype.indexOf != "function") {
              var nameArr = new String();
              nameBox = csvFriendly(myStory.contents);
              nameArr = nameBox.split("</p><p>");      
-             pageRow[4] = "\"" + nameArr[nameArr.length-1] + "\"";
+             pageRow[6] = "\"" + nameArr[nameArr.length-1] + "\"";
              nameArr.pop();
-             pageRow[3] = "\"" + nameArr.toString().replace("\,"," ") + "\"";
+             pageRow[5] = "\"" + nameArr.toString().replace("\,"," ") + "\"";
              }
          
 //~          //parses Sidebar for size
        if (myStoryStyle == "Project Details"){
-             pageRow[5] = parseSidebar(myStory,"Size","Services");
-             pageRow[6] = parseSidebar(myStory,"Services","Client");
+             pageRow[7] = parseSidebar(myStory,"Size","Services");
+             pageRow[8] = parseSidebar(myStory,"Services","Client");
             }
          
 //~          //parses for Description text & compares the length of the story to see if it is the longest string represented so far    
          if (myStoryStyle == "Body Text" && myStoryText.length > largest.length){
              largest = myStoryText;
-             pageRow[7] = myStoryText;
+             pageRow[9] = myStoryText;
              }
          
          if (myStoryStyle == "Project Page Callout") pageRow[8] = myStoryText;
@@ -104,7 +108,8 @@ if (typeof Array.prototype.indexOf != "function") {
 
 function writeFile(fileObj, fileContent, encoding) {  
     encoding = encoding || "UTF-8";  
-    var titleRow = [csvQuotes("Path"),csvQuotes("FileName"),csvQuotes("ProjectNo"),
+    var titleRow = [        csvQuotes("Link"),csvQuotes("Modified"),
+                            csvQuotes("Path"),csvQuotes("FileName"),csvQuotes("ProjectNo"),
                             csvQuotes("Title"),csvQuotes("Location"),csvQuotes("SquareFootage"),
                             csvQuotes("Services"),csvQuotes("ProjectDescription"),csvQuotes("CallOut"),
                             csvQuotes("Link1"),csvQuotes("Link2"),csvQuotes("Link3"),
@@ -124,7 +129,6 @@ function writeFile(fileObj, fileContent, encoding) {
     fileObj.open("a");  
     fileObj.write(fileContent2);  
     fileObj.close();  
-  
   
     return fileObj;  
 }  
