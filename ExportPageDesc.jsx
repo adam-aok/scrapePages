@@ -51,7 +51,7 @@ if (typeof Array.prototype.indexOf != "function") {
 
     //file information 
     pageRow[0] = csvQuotes(app.activeDocument.fullName.toString().replace("/m/","//d-peapcny.net/enterprise/M_Marketing/"));
-    pageRow[1] = = csvQuotes(File(app.activeDocument.fullName).modified);
+    pageRow[1] = csvQuotes(File(app.activeDocument.fullName).modified);
 
     var fnArr = app.activeDocument.name.split("_");
     pageRow[2] = ("\"" + app.activeDocument.filePath + "\"")
@@ -63,7 +63,7 @@ if (typeof Array.prototype.indexOf != "function") {
     myLinks = app.activeDocument.links;
 
     for (w=0;w<myLinks.length;w++) if (myLinks[w].parent.parentPage !== null && myLinks[w].parent.itemLayer == mainLayer) linkBucket.push(myLinks[w]);
-    for (z = 0;z<linkBucket.length;z++) pageRow[9+z] = csvQuotes(linkBucket[z].name);   
+    for (z = 0;z<linkBucket.length;z++) pageRow[11+z] = csvQuotes(linkBucket[z].name);   
     
     for(myCounter = 0; myCounter < app.activeDocument.stories.length; myCounter++){
          
@@ -94,7 +94,7 @@ if (typeof Array.prototype.indexOf != "function") {
              pageRow[9] = myStoryText;
              }
          
-         if (myStoryStyle == "Project Page Callout") pageRow[8] = myStoryText;
+         if (myStoryStyle == "Project Page Callout") pageRow[10] = myStoryText;
          
         
 
