@@ -1,4 +1,5 @@
 ﻿//scrapePages: worked on during August - September 2019
+//updated in Spring of 2021 to include links, callouts, and file modified date/times
 //Scrapes data from Adobe InDesign Document in one of various standard firm layouts for output to loadable CSV
 
 main();
